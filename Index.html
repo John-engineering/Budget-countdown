@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown until 2027 Irish budget</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #10b981; /* Changed to green for Ireland theme */
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .countdown-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .time-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px 10px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid #334155;
+        }
+
+        .time-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .time-label {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+        }
+
+        .settings {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #cbd5e1;
+        }
+
+        input {
+            background-color: var(--bg-color);
+            border: 1px solid #475569;
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #059669;
+        }
+
+        @media (max-width: 480px) {
+            .countdown-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .time-number {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 id="event-title">Countdown until 2027 Irish budget</h1>
+        <div id="event-date-display" class="subtitle">Loading countdown...</div>
+
+        <div class="countdown-container">
+            <div class="time-card">
+                <div id="days" class="time-number">00</div>
+                <div class="time-label">Days</div>
+            </div>
+            <div class="time-card">
+                <div id="hours" class="time-number">00</div>
+                <div class="time-label">Hours</div>
+            </div>
+            <div class="time-card">
+                <div id="minutes" class="time-number">00</div>
+                <div class="time-label">Minutes</div>
+            </div>
+            <div class="time-card">
+                <div id="seconds" class="time-number">00</div>
+                <div class="time-label">Seconds</div>
+            </div>
+        </div>
+
+        <div class="settings">
+            <div class="form-group">
+                <label for="title-input">Event Name</label>
+                <input type="text" id="title-input" value="Countdown until 2027 Irish budget">
+            </div>
+            <div class="form-group">
+                <label for="date-input">Target Date & Time</label>
+                <input type="datetime-local" id="date-input">
+            </div>
+            <button onclick="updateTarget()">Set New Countdown</button>
+        </div>
+    </div>
+
+    <script>
+        let countdownInterval;
+        let targetDate;
+
+        // Set default target to the expected date of Budget 2027 (typically first Tuesday of October)
+        // Adjusting default to October 6, 2026, at 13:00 (1 PM) as a fallback baseline
+        const defaultDate = new Date("2026-10-06T13:00:00");
+
+        // Initialize input value
+        document.getElementById('date-input').value = new Date(defaultDate.getTime() - defaultDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
+        function startCountdown(endTime) {
+            clearInterval(countdownInterval);
+            targetDate = new Date(endTime).getTime();
+
+            function update() {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById("days").innerText = "00";
+                    document.getElementById("hours").innerText = "00";
+                    document.getElementById("minutes").innerText = "00";
+                    document.getElementById("seconds").innerText = "00";
+                    document.getElementById("event-date-display").innerText = "The budget announcement has started!";
+                    return;
+                }
+
+                const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("days").innerText = d.toString().padStart(2, '0');
+                document.getElementById("hours").innerText = h.toString().padStart(2, '0');
+                document.getElementById("minutes").innerText = m.toString().padStart(2, '0');
+                document.getElementById("seconds").innerText = s.toString().padStart(2, '0');
+            }
+
+            update();
+            countdownInterval = setInterval(update, 1000);
+        }
+
+        function updateTarget() {
+            const titleInput = document.getElementById('title-input').value;
+            const dateInput = document.getElementById('date-input').value;
+
+            if (!dateInput) return alert('Please select a date and time.');
+
+            document.getElementById('event-title').innerText = titleInput || "Countdown";
+            
+            const formattedDate = new Date(dateInput).toLocaleString();
+            document.getElementById('event-date-display').innerText = `Target: ${formattedDate}`;
+
+            startCountdown(dateInput);
+        }
+
+        // Initial launch
+        updateTarget();
+    </script>
+</body>
+</html>
